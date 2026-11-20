@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>800 Battery Experts - Tax Invoice &amp; Layout Previewer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #0f1d36;
+    --navy-2: #1b3158;
+    --gold: #b8944b;
+    --orange: #f28c28;
+    --line: #dce2ea;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #eef2f6;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    color: #162032;
+    font-size: 13px;
+  }
+
+  /* Base A4 Sheet Container */
+  .invoice-sheet {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 18px auto 28px;
+    padding: 11mm;
+    background: #ffffff;
+    box-shadow: 0 10px 32px rgba(15, 29, 54, 0.08);
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+  }
+
+  /* Default shared elements */
+  .brand-svg {
+    width: 225px;
+    height: auto;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--orange);
+    padding-bottom: 12px;
+    gap: 16px;
+  }
+
+  .invoice-title-box {
+    text-align: right;
+  }
+
+  .invoice-title-box h1 {
+    color: var(--navy);
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    margin: 0;
+  }
+
+  .company-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .panel-box {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px;
+    background: #ffffff;
+  }
+
+  .panel-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy-2);
+    margin: 0 0 8px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #eef2f6;
+    padding-bottom: 5px;
+  }
+
+  .customer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px 10px;
+  }
+
+  .field-group {
+    margin-bottom: 3px;
+  }
+
+  .field-group.full-span {
+    grid-column: 1 / -1;
+  }
+
+  .field-label {
+    display: block;
+    color: #5b667a;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+
+  .inv-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    color: #162032;
+    background: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .inv-input:focus {
+    outline: none;
+    border-color: var(--navy-2);
+    box-shadow: 0 0 0 2px rgba(27, 49, 88, 0.08);
+  }
+
+  .trn-box {
+    margin-top: 8px;
+    padding: 6px 8px;
+    background: #f8fafc;
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+    font-size: 11px;
+  }
+
+  .meta-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 12px 0;
+    padding: 10px;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .section-heading {
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 14px 0 7px;
+    text-transform: uppercase;
+  }
+
+  .preset-bar {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .preset-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    color: #9a3412;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .preset-chip:hover {
+    background: #ffedd5;
+  }
+
+  .items-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .items-table th {
+    background: var(--navy);
+    color: #ffffff;
+    padding: 8px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-align: left;
+  }
+
+  .items-table th:first-child {
+    border-top-left-radius: 6px;
+  }
+
+  .items-table th:last-child {
+    border-top-right-radius: 6px;
+  }
+
+  .items-table td {
+    border-bottom: 1px solid var(--line);
+    padding: 5px 6px;
+  }
+
+  .items-table td input {
+    border: 1px solid transparent;
+    background: #f8fafc;
+    padding: 6px;
+    border-radius: 6px;
+    width: 100%;
+    font-family: inherit;
+    font-size: 12px;
+    color: #162032;
+  }
+
+  .items-table td input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: var(--navy-2);
+  }
+
+  .qty-input {
+    width: 68px !important;
+  }
+
+  .price-input {
+    width: 108px !important;
+  }
+
+  .line-total {
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .remove-item-btn {
+    padding: 4px 9px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .remove-item-btn:hover {
+    background: #fecaca;
+  }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.95fr;
+    gap: 12px;
+    margin-top: 14px;
+    align-items: stretch;
+  }
+
+  .totals-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px;
+    background: #f8fafc;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 11.5px;
+    gap: 10px;
+  }
+
+  .summary-row:last-child {
+    border-bottom: 0;
+  }
+
+  .summary-row input {
+    max-width: 108px;
+    text-align: right;
+    background: #ffffff;
+  }
+
+  .grand-total-row {
+    color: var(--navy);
+    font-size: 16px;
+    font-weight: 800;
+    background: #ffffff;
+    margin: 4px -4px;
+    padding: 8px 8px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+  }
+
+  .terms-card {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: #fcfcfd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .terms-card h3 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #eef2f6;
+    padding-bottom: 5px;
+  }
+
+  .terms-card p {
+    font-size: 10px;
+    color: #334155;
+    line-height: 1.5;
+    margin: 3.5px 0;
+  }
+
+  .invoice-footer {
+    text-align: center;
+    color: #64748b;
+    border-top: 1px solid var(--line);
+    margin-top: 12px;
+    padding-top: 9px;
+    font-size: 10.5px;
+  }
+
+  .status-pill {
+    display: none;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+
+  /* =========================================================================
+     TEMPLATE 1: EXECUTIVE NAVY BANNER (Corporate & Fleet-Ready)
+     ========================================================================= */
+  .invoice-sheet.tpl-executive {
+    border-top: 6px solid var(--gold);
+  }
+
+  .invoice-sheet.tpl-executive .header-bar {
+    background: linear-gradient(135deg, #0f1d36 0%, #1a3056 100%);
+    color: #ffffff;
+    padding: 16px 18px;
+    border-radius: 8px;
+    border-bottom: 4px solid var(--gold);
+  }
+
+  .invoice-sheet.tpl-executive .header-bar svg .logo-navy-text {
+    fill: #ffffff;
+  }
+
+  .invoice-sheet.tpl-executive .header-bar svg .logo-tagline-navy {
+    fill: #e2e8f0;
+  }
+
+  .invoice-sheet.tpl-executive .invoice-title-box h1 {
+    color: #f3dca2;
+    font-size: 26px;
+    letter-spacing: 1px;
+  }
+
+  .invoice-sheet.tpl-executive .invoice-title-box p {
+    color: #cbd5e1;
+  }
+
+  .invoice-sheet.tpl-executive .panel-heading {
+    color: #9a752c;
+    border-bottom-color: #f1e6ce;
+  }
+
+  .invoice-sheet.tpl-executive .meta-strip {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    border-top: 3px solid var(--navy);
+  }
+
+  .invoice-sheet.tpl-executive .items-table th {
+    background: #0f1d36;
+    color: #f3dca2;
+  }
+
+  /* =========================================================================
+     TEMPLATE 2: MOBILE-FIRST QUICK-SERVICE CARD (Roadside & Technician Speed)
+     ========================================================================= */
+  .invoice-sheet.tpl-mobile-quick {
+    max-width: 680px;
+    width: 100%;
+    padding: 16px;
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+  }
+
+  .invoice-sheet.tpl-mobile-quick .status-pill {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 6px;
+  }
+
+  .invoice-sheet.tpl-mobile-quick .preset-bar {
+    display: flex;
+  }
+
+  .invoice-sheet.tpl-mobile-quick .company-grid,
+  .invoice-sheet.tpl-mobile-quick .customer-grid,
+  .invoice-sheet.tpl-mobile-quick .meta-strip,
+  .invoice-sheet.tpl-mobile-quick .bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .invoice-sheet.tpl-mobile-quick .panel-box,
+  .invoice-sheet.tpl-mobile-quick .totals-card,
+  .invoice-sheet.tpl-mobile-quick .terms-card {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 29, 54, 0.04);
+  }
+
+  .invoice-sheet.tpl-mobile-quick .inv-input,
+  .invoice-sheet.tpl-mobile-quick .items-table td input {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  /* =========================================================================
+     TEMPLATE 3: MINIMALIST LIGHT & GOLD (High-Whitespace Editorial)
+     ========================================================================= */
+  .invoice-sheet.tpl-minimal-gold {
+    background: #ffffff;
+    border: 1px solid #e5dec9;
+    box-shadow: 0 8px 28px rgba(15, 29, 54, 0.05);
+  }
+
+  .invoice-sheet.tpl-minimal-gold .header-bar {
+    border-bottom: 1px solid #d8c394;
+    padding-bottom: 14px;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .invoice-title-box h1 {
+    color: #9a752c;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .panel-box,
+  .invoice-sheet.tpl-minimal-gold .meta-strip,
+  .invoice-sheet.tpl-minimal-gold .totals-card {
+    background: #ffffff;
+    border: 0;
+    border-top: 1px solid #e6dec8;
+    border-bottom: 1px solid #e6dec8;
+    border-radius: 0;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .panel-heading,
+  .invoice-sheet.tpl-minimal-gold .section-heading,
+  .invoice-sheet.tpl-minimal-gold .field-label {
+    color: #9a752c;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .items-table th {
+    background: #faf6ec;
+    color: #8b6925;
+    border-top: 1px solid #d8c394;
+    border-bottom: 1.5px solid #b8944b;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .items-table tbody tr:nth-child(even) td {
+    background: #fcfaf4;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .items-table td input {
+    background: transparent;
+  }
+
+  .invoice-sheet.tpl-minimal-gold .grand-total-row {
+    background: #faf6ec;
+    border-color: #d8c394;
+    color: #0f1d36;
+  }
+
+  /* =========================================================================
+     TEMPLATE 4: SPLIT-SIDEBAR LEDGER (Asymmetric 30% / 70% Split)
+     ========================================================================= */
+  .invoice-sheet.tpl-split-ledger {
+    width: 220mm;
+    padding: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 30% 70%;
+  }
+
+  .invoice-sheet.tpl-split-ledger .split-left {
+    background: #f1f5f9;
+    border-right: 2px solid #cbd5e1;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .invoice-sheet.tpl-split-ledger .split-right {
+    padding: 14px 16px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .invoice-sheet.tpl-split-ledger .brand-svg {
+    width: 100%;
+    max-width: 195px;
+    margin: 0 auto;
+  }
+
+  .invoice-sheet.tpl-split-ledger .header-bar {
+    border-bottom: 2px solid var(--navy);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .invoice-sheet.tpl-split-ledger .company-grid {
+    grid-template-columns: 1fr;
+    margin: 8px 0;
+  }
+
+  .invoice-sheet.tpl-split-ledger .meta-strip {
+    grid-template-columns: 1fr;
+    background: #ffffff;
+    margin: 6px 0;
+    padding: 8px;
+  }
+
+  .invoice-sheet.tpl-split-ledger .bottom-grid {
+    grid-template-columns: 1fr;
+    margin-top: 12px;
+  }
+
+  .invoice-sheet.tpl-split-ledger .panel-box {
+    background: #ffffff;
+  }
+
+  /* Responsive Layout Adjustments */
+  @media (max-width: 900px) {
+    .invoice-sheet,
+    .invoice-sheet.tpl-split-ledger {
+      width: 100%;
+      min-height: 0;
+      margin: 0;
+      padding: 14px;
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+      display: block;
+    }
+    .invoice-sheet.tpl-split-ledger .split-left {
+      border-right: 0;
+      border-bottom: 2px solid #cbd5e1;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .invoice-sheet.tpl-split-ledger .split-right {
+      padding: 0;
+    }
+    .meta-strip {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .header-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .invoice-title-box {
+      text-align: left;
+    }
+    .brand-svg {
+      width: 190px;
+    }
+    .company-grid,
+    .customer-grid,
+    .meta-strip,
+    .bottom-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .inv-input {
+      min-width: 0;
+    }
+  }
+
+  /* Print / Save PDF Styling */
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 5mm;
+    }
+
+    body {
+      background: #ffffff;
+      font-size: 9px;
+    }
+
+    .no-print,
+    .remove-col,
+    .preset-bar {
+      display: none !important;
+    }
+
+    .invoice-sheet,
+    .invoice-sheet.tpl-split-ledger,
+    .invoice-sheet.tpl-mobile-quick {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 0;
+      margin: 0 !important;
+      padding: 3mm !important;
+      box-shadow: none !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: #ffffff !important;
+    }
+
+    .invoice-sheet.tpl-split-ledger {
+      display: grid !important;
+      grid-template-columns: 31% 69% !important;
+      gap: 8px;
+    }
+
+    .invoice-sheet.tpl-split-ledger .split-left {
+      background: #f8fafc !important;
+      border-right: 1px solid #cbd5e1 !important;
+      border-bottom: 0 !important;
+      padding: 6px !important;
+    }
+
+    .invoice-sheet.tpl-split-ledger .split-right {
+      padding: 6px !important;
+    }
+
+    .brand-svg {
+      width: 165px;
+    }
+
+    .invoice-title-box h1 {
+      font-size: 18px;
+    }
+
+    .company-grid,
+    .meta-strip,
+    .bottom-grid {
+      margin: 6px 0;
+      gap: 7px;
+    }
+
+    .panel-box,
+    .totals-card,
+    .meta-strip {
+      padding: 6px;
+      background: #ffffff;
+    }
+
+    .items-table th {
+      padding: 5px;
+    }
+
+    .items-table td {
+      padding: 3px;
+    }
+
+    .inv-input,
+    .items-table td input {
+      border: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 2px !important;
+      font-size: 9px;
+      color: #111111;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .summary-row {
+      padding: 3px 0;
+    }
+
+    .grand-total-row {
+      font-size: 12px;
+      padding: 4px;
+    }
+
+    .terms-card {
+      padding: 7px 9px;
+    }
+
+    .terms-card p {
+      font-size: 7.8px;
+      line-height: 1.3;
+      margin: 2px 0;
+    }
+
+    .terms-card h3 {
+      font-size: 8.5px;
+      margin-bottom: 4px;
+    }
+
+    .invoice-footer {
+      margin-top: 6px;
+      padding-top: 4px;
+    }
+
+    tr,
+    .panel-box,
+    .totals-card,
+    .terms-card {
+      break-inside: avoid;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Sticky App Action Toolbar & Live Layout Switcher -->
+<div class="no-print sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-3 py-2.5 shadow-sm">
+  <div class="max-w-7xl mx-auto flex flex-col gap-2">
+
+    <!-- Row 1: Layout Template Switcher -->
+    <div class="flex flex-wrap items-center justify-center gap-1.5 pb-1.5 border-b border-slate-100">
+      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mr-1">Layout Template:</span>
+      <button type="button" data-template="tpl-executive" class="tpl-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-[#0f1d36] text-white border-[#0f1d36]">
+        1. Executive Navy Banner
+      </button>
+      <button type="button" data-template="tpl-mobile-quick" class="tpl-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-slate-100 text-[#0f1d36] border-slate-200 hover:bg-slate-200">
+        2. Mobile-First Quick-Service
+      </button>
+      <button type="button" data-template="tpl-minimal-gold" class="tpl-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-slate-100 text-[#0f1d36] border-slate-200 hover:bg-slate-200">
+        3. Minimalist Light &amp; Gold
+      </button>
+      <button type="button" data-template="tpl-split-ledger" class="tpl-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-slate-100 text-[#0f1d36] border-slate-200 hover:bg-slate-200">
+        4. Split-Sidebar Ledger
+      </button>
+    </div>
+
+    <!-- Row 2: Primary Invoice Actions & Sequential Counter -->
+    <div id="toolbarActions" class="flex flex-wrap items-center justify-center gap-2">
+      <button type="button" id="btnAddItem" data-action="addItem" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-[#f28c28] hover:bg-[#e07d1b] text-slate-950 font-bold text-xs transition cursor-pointer shadow-sm">
+        + ADD ITEM
+      </button>
+      <button type="button" id="btnShareWhatsApp" data-action="shareWhatsApp" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition cursor-pointer shadow-sm">
+        SHARE WHATSAPP
+      </button>
+      <button type="button" id="btnPrintPdf" data-action="printInvoice" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-[#0f1d36] hover:bg-[#1b3158] text-white font-bold text-xs transition cursor-pointer shadow-sm">
+        PRINT / SAVE PDF
+      </button>
+      <button type="button" id="btnSaveImage" data-action="saveImage" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#0f1d36] font-bold text-xs border border-slate-200 transition cursor-pointer">
+        SAVE AS IMAGE
+      </button>
+      <button type="button" id="btnSaveDraft" data-action="saveDraft" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#0f1d36] font-bold text-xs border border-slate-200 transition cursor-pointer">
+        SAVE DRAFT
+      </button>
+      <button type="button" id="btnLoadDraft" data-action="loadDraft" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#0f1d36] font-bold text-xs border border-slate-200 transition cursor-pointer">
+        LOAD DRAFT
+      </button>
+      <button type="button" id="btnNewInvoice" data-action="newInvoice" class="p-2 sm:px-3.5 sm:py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#0f1d36] font-bold text-xs border border-slate-200 transition cursor-pointer">
+        NEW INVOICE
+      </button>
+
+      <!-- Sequential Invoice Number Counter Pill -->
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-semibold text-[#0f1d36]">
+        <span>Next Seq: <strong id="nextSeqLabel">800CB-0001</strong></span>
+        <button type="button" id="btnResetSeq" data-action="resetSequence" title="Reset sequence counter" class="px-2 py-0.5 rounded-full bg-white hover:bg-rose-50 text-rose-700 border border-slate-300 text-[10px] font-bold cursor-pointer transition">
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Iframe-Safe Inline Confirmation Prompt Bar -->
+  <div id="inlineConfirmBar" class="hidden max-w-3xl mx-auto mt-2.5 p-3 rounded-xl bg-amber-50 border border-amber-300 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+    <div class="flex items-center gap-2 text-xs text-slate-800">
+      <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white font-extrabold text-[11px]">!</span>
+      <div>
+        <strong id="inlineConfirmTitle" class="text-[#0f1d36] mr-1">Confirm:</strong>
+        <span id="inlineConfirmMessage">Are you sure?</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 ml-auto">
+      <button type="button" id="inlineConfirmCancelBtn" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-300 cursor-pointer transition">
+        Cancel
+      </button>
+      <button type="button" id="inlineConfirmProceedBtn" class="px-3 py-1.5 rounded-lg bg-[#0f1d36] hover:bg-[#1b3158] text-white font-bold text-xs cursor-pointer transition">
+        Yes, Proceed
+      </button>
+    </div>
+  </div>
+
+  <!-- Copyable WhatsApp Share Fallback Bar -->
+  <div id="whatsappShareBar" class="hidden max-w-4xl mx-auto mt-2.5 p-3 rounded-xl bg-emerald-50 border border-emerald-300 shadow-xs">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+      <span class="text-xs font-bold text-emerald-950">WhatsApp Invoice Summary &amp; Direct Link</span>
+      <div class="flex flex-wrap items-center gap-2">
+        <a id="waDirectAnchor" href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs no-underline transition">
+          Open WhatsApp
+        </a>
+        <button type="button" id="btnCopyWaMsg" class="px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-100 text-emerald-900 font-bold text-xs border border-emerald-300 cursor-pointer transition">
+          Copy Summary Text
+        </button>
+        <button type="button" id="btnCloseWaBar" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 font-bold text-xs border border-slate-200 cursor-pointer transition">
+          Close
+        </button>
+      </div>
+    </div>
+    <textarea id="waPreviewText" readonly rows="4" class="w-full p-2 text-[11px] font-mono bg-white border border-emerald-200 rounded-lg text-slate-800 resize-y"></textarea>
+  </div>
+</div>
+
+<!-- Main Invoice Document (Classes dynamically switch across all 4 layouts) -->
+<main class="invoice-sheet tpl-executive" id="invoice">
+
+  <!-- Left Column (Used in Split-Sidebar Ledger; flows naturally in other layouts) -->
+  <div class="split-left" id="splitLeftCol">
+    <div class="flex items-center justify-center" id="brandLogoSlot">
+      <!-- Inline Crisp SVG Logo Matching 800 Battery Experts Emblem -->
+      <svg id="brandLogoSvg" class="brand-svg" viewBox="0 0 420 215" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="800 Battery Experts - Powering Your Drive in Dubai">
+        <defs>
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#d7b46a"/>
+            <stop offset="45%" stop-color="#f3dca2"/>
+            <stop offset="100%" stop-color="#9f7a32"/>
+          </linearGradient>
+          <linearGradient id="batteryFill" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#b48c3e"/>
+            <stop offset="50%" stop-color="#f6e2b3"/>
+            <stop offset="100%" stop-color="#a88034"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Shield Outline -->
+        <path d="M148 34 L210 12 L272 34 L272 48 L267 48 L267 37 L210 17 L153 37 L153 48 L148 48 Z" fill="#0f1d36"/>
+        <path d="M157 47 L157 39 L210 20 L263 39 L263 47" fill="none" stroke="#b8944b" stroke-width="2.2"/>
+        <path d="M167 99 C181 112 196 121 210 127 C224 121 239 112 253 99 L248 99 C235 110 222 118 210 123 C198 118 185 110 172 99 Z" fill="#0f1d36"/>
+        <path d="M174 99 C186 109 198 116 210 120 C222 116 234 109 246 99" fill="none" stroke="#b8944b" stroke-width="2"/>
+
+        <!-- Sleek Car Silhouette -->
+        <path d="M98 83 C99 75 103 69 112 66 C127 61 146 58 164 57 C183 44 202 38 225 39 C247 40 268 47 289 56 L305 56 L308 61 L303 65 C307 71 309 77 309 84 L303 84 C303 75 299 68 291 64 L262 64 C252 64 246 58 242 52 C228 45 212 43 196 46 C185 48 176 53 168 60 L205 61 L160 64 C140 65 121 68 110 73 C106 75 104 79 104 84 L99 88 L95 88 Z" fill="#0f1d36"/>
+
+        <!-- Gold Car Accents -->
+        <path d="M111 73 L123 71 L117 77 Z" fill="#b8944b"/>
+        <path d="M150 67 C157 65 164 65 170 67 L161 71 Z" fill="#b8944b"/>
+        <path d="M254 60 L295 60 L292 63 L257 63 Z" fill="#b8944b"/>
+
+        <!-- Wheel Arches -->
+        <path d="M123 93 C120 81 128 70 140 70 C150 70 158 76 159 85 L154 85 C152 79 147 75 140 75 C131 75 125 83 127 93 Z" fill="#0f1d36"/>
+        <path d="M262 86 C262 76 270 69 280 69 C289 69 296 74 298 81 L293 81 C291 77 286 74 280 74 C273 74 267 79 267 86 Z" fill="#0f1d36"/>
+
+        <!-- Speed Lines Right -->
+        <polygon points="274,83 328,83 321,86 274,86" fill="#0f1d36"/>
+        <polygon points="269,89 321,89 314,92 269,92" fill="#0f1d36"/>
+        <polygon points="263,95 313,95 304,98 263,98" fill="#0f1d36"/>
+
+        <!-- Ground Line -->
+        <polygon points="106,96 312,96 302,99 114,99" fill="#0f1d36"/>
+
+        <!-- Center Battery Icon with Gold Gradient & Lightning Bolt -->
+        <rect x="165" y="64" width="84" height="31" rx="5" fill="#ffffff" stroke="#0f1d36" stroke-width="4.5"/>
+        <rect x="249" y="72" width="7" height="15" rx="2" fill="#0f1d36"/>
+        <rect x="171" y="69" width="72" height="21" rx="2.5" fill="url(#batteryFill)"/>
+
+        <!-- Lightning Bolt -->
+        <polygon points="217,54 195,82 208,82 198,106 226,76 212,76" fill="#ffffff" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+        <polygon points="217,54 195,82 208,82 198,106 226,76 212,76" fill="url(#goldGrad)"/>
+
+        <!-- Main Title Typography: 800 BATTERY EXPERTS -->
+        <text x="210" y="154" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="35" letter-spacing="0.5">
+          <tspan fill="url(#goldGrad)" stroke="#9a752c" stroke-width="0.6">800</tspan>
+          <tspan class="logo-navy-text" fill="#0f1d36" stroke="#b8944b" stroke-width="0.8"> BATTERY</tspan>
+        </text>
+        <text x="210" y="187" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="34" letter-spacing="2.2" class="logo-navy-text" fill="#0f1d36" stroke="#b8944b" stroke-width="0.9">
+          EXPERTS
+        </text>
+
+        <!-- Tagline -->
+        <text x="210" y="206" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="11.2" letter-spacing="1.1">
+          <tspan class="logo-tagline-navy" fill="#0f1d36">POWERING </tspan>
+          <tspan fill="#b8944b">YOUR DRIVE IN DUBAI</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <!-- Supplier Details Panel (Moved into Split Left Column in Template 4) -->
+    <div class="panel-box" id="supplierPanel">
+      <h3 class="panel-heading">Supplier Details</h3>
+      <div class="text-[11.5px] leading-[1.65]">
+        <strong>800 Battery Experts</strong><br>
+        11A Street &amp; Street 20A,<br>
+        Al Quoz Industrial Area 3, Dubai, UAE<br>
+        Phone: +971 56 621 4363<br>
+        Email: services@carbattery.ae
+      </div>
+      <div class="trn-box">
+        <strong>TRN:</strong> 100482917360503
+      </div>
+    </div>
+
+    <!-- Metadata Strip (Moved into Split Left Column in Template 4) -->
+    <section class="meta-strip" id="metaStrip">
+      <div class="field-group">
+        <label class="field-label" for="invoiceNo">Invoice Number</label>
+        <input id="invoiceNo" class="inv-input font-semibold">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="invoiceDate">Invoice Date</label>
+        <input id="invoiceDate" class="inv-input" type="date">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="payment">Payment Method</label>
+        <select id="payment" class="inv-input">
+          <option>Cash</option>
+          <option>Card</option>
+          <option>Bank Transfer</option>
+          <option>Tabby</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="vatMode">VAT Pricing Mode</label>
+        <select id="vatMode" class="inv-input">
+          <option value="exclusive">VAT Exclusive (Add VAT)</option>
+          <option value="inclusive">VAT Inclusive (Included in Price)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Terms & Conditions Block (Placed beside Totals in standard layouts; moved to Split Left in Template 4) -->
+    <section class="terms-card" id="termsCard">
+      <h3>TERMS &amp; CONDITIONS</h3>
+      <p>All batteries are warranted solely with a valid warranty card.</p>
+      <p>It is mandatory to keep and preserve the warranty card in order to avail of any warranty claims in the future.</p>
+      <p>Please be aware that the physical warranty card must be submitted along with any warranty claim.</p>
+      <p>Our team will be able to provide you with further details and guide you through the necessary steps.</p>
+      <p>Furthermore, please note that all batteries are considered final sale.</p>
+      <p>We do not offer refunds or exchanges for batteries once they have been purchased.</p>
+      <p>Thank you for your understanding and cooperation.</p>
+    </section>
+  </div>
+
+  <!-- Right / Main Column -->
+  <div class="split-right" id="splitRightCol">
+    <div>
+      <header class="header-bar" id="mainHeaderBar">
+        <div id="headerLogoTarget" class="flex items-center"></div>
+
+        <div class="invoice-title-box">
+          <h1>TAX INVOICE</h1>
+          <p class="text-slate-500 text-[11px] mt-1 mb-0">United Arab Emirates</p>
+          <span id="paymentStatusPill" class="status-pill bg-amber-100 text-amber-900 border border-amber-300">
+            Balance Due
+          </span>
+        </div>
+      </header>
+
+      <section class="company-grid" id="partiesGrid">
+        <div id="supplierSlot"></div>
+
+        <!-- Bill To / Customer Details -->
+        <div class="panel-box" id="customerPanel">
+          <h3 class="panel-heading">Bill To / Customer</h3>
+          <div class="customer-grid">
+            <div class="field-group">
+              <label class="field-label" for="customer">Customer Name</label>
+              <input id="customer" class="inv-input" placeholder="Customer name">
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="phone">Phone Number</label>
+              <input id="phone" class="inv-input" placeholder="e.g. +971 50 123 4567">
+            </div>
+
+            <div class="field-group full-span">
+              <label class="field-label" for="email">Email</label>
+              <input id="email" class="inv-input" placeholder="Email address">
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="vehicle">Vehicle Make / Model / Year</label>
+              <input id="vehicle" class="inv-input" placeholder="Vehicle details">
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="plate">Registration / Plate Number</label>
+              <input id="plate" class="inv-input" placeholder="Plate number">
+            </div>
+
+            <div class="field-group full-span">
+              <label class="field-label" for="battery">Battery Brand / Model</label>
+              <input id="battery" class="inv-input" placeholder="Battery details">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="metaSlot"></div>
+
+      <!-- Line Items Section -->
+      <h3 class="section-heading">Invoice Items</h3>
+
+      <!-- Quick-Tap Service Preset Chips (Visible in Mobile-First Quick-Service layout) -->
+      <div class="preset-bar no-print" id="quickPresets">
+        <button type="button" class="preset-chip" data-preset-desc="Car Battery Replacement &amp; Installation" data-preset-price="420">+ Battery Replacement</button>
+        <button type="button" class="preset-chip" data-preset-desc="Emergency Roadside Jump Start" data-preset-price="120">+ Jump Start</button>
+        <button type="button" class="preset-chip" data-preset-desc="Battery &amp; Alternator Diagnostic Check" data-preset-price="75">+ Alternator Check</button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width:45%">DESCRIPTION</th>
+              <th>QTY</th>
+              <th>UNIT PRICE (AED)</th>
+              <th style="text-align:right">LINE TOTAL (AED)</th>
+              <th class="remove-col" style="width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="items"></tbody>
+        </table>
+      </div>
+
+      <div class="no-print mt-2">
+        <button type="button" id="btnAddAnotherItem" data-action="addItem" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#0f1d36] font-bold text-xs border border-slate-200 transition cursor-pointer">
+          + ADD ANOTHER ITEM
+        </button>
+      </div>
+
+      <!-- Terms & Totals Grid -->
+      <section class="bottom-grid" id="bottomGrid">
+        <div id="termsSlot"></div>
+
+        <div class="totals-card" id="totalsCard">
+          <div class="summary-row">
+            <span id="grossLabel">Items Total (VAT Exc.)</span>
+            <strong id="subtotal">AED 0.00</strong>
+          </div>
+
+          <div class="summary-row">
+            <label for="discount" class="text-[11.5px] font-normal text-[#162032] m-0">Discount (AED)</label>
+            <input id="discount" class="inv-input" type="number" value="0" min="0" step="0.01">
+          </div>
+
+          <div class="summary-row">
+            <span>Taxable Amount</span>
+            <strong id="taxable">AED 0.00</strong>
+          </div>
+
+          <div class="summary-row">
+            <label for="vatRate" class="text-[11.5px] font-normal text-[#162032] m-0">VAT Rate (%)</label>
+            <input id="vatRate" class="inv-input" type="number" value="5" min="0" step="0.01">
+          </div>
+
+          <div class="summary-row">
+            <span>VAT Amount</span>
+            <strong id="vat">AED 0.00</strong>
+          </div>
+
+          <div class="text-[10px] text-slate-500 my-1" id="vatModeNote">
+            Prices are treated as VAT-exclusive; VAT is added after discount.
+          </div>
+
+          <div class="summary-row grand-total-row">
+            <span>TOTAL DUE</span>
+            <strong id="grand">AED 0.00</strong>
+          </div>
+
+          <div class="field-group mt-2">
+            <label class="field-label" for="paid">Amount Paid (AED)</label>
+            <input id="paid" class="inv-input" type="number" value="0" min="0" step="0.01">
+          </div>
+
+          <div class="summary-row">
+            <span class="font-bold text-[#0f1d36]">BALANCE DUE</span>
+            <strong id="balance" class="text-[#0f1d36]">AED 0.00</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="invoice-footer">
+      Thank you for choosing 800 Battery Experts.
+      <br>POWERING YOUR DRIVE IN DUBAI
+    </footer>
+  </div>
+
+</main>
+
+<!-- Non-Blocking Toast Banner -->
+<div id="toast" class="no-print fixed bottom-4 right-4 z-50 bg-[#0f1d36] text-white px-4 py-2.5 rounded-lg text-xs font-semibold shadow-xl opacity-0 translate-y-2 pointer-events-none transition-all duration-200"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  // Storage keys for sequential numbering, saved drafts, and active layout template
+  const SEQ_KEY = "800batteryLastSeq";
+  const DRAFT_KEY = "800batteryDraft";
+  const TEMPLATE_KEY = "800batteryTemplate";
+  const PREFIX = "800CB-";
+
+  const ALL_TEMPLATES = [
+    "tpl-executive",
+    "tpl-mobile-quick",
+    "tpl-minimal-gold",
+    "tpl-split-ledger"
+  ];
+
+  const TEMPLATE_NAMES = {
+    "tpl-executive": "Executive Navy Banner",
+    "tpl-mobile-quick": "Mobile-First Quick-Service Card",
+    "tpl-minimal-gold": "Minimalist Light & Gold",
+    "tpl-split-ledger": "Split-Sidebar Ledger"
+  };
+
+  // Safe in-memory fallback when localStorage is restricted in a sandboxed iframe
+  const memoryStore = new Map();
+  function readStorage(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch {
+      return memoryStore.has(key) ? memoryStore.get(key) : null;
+    }
+  }
+  function writeStorage(key, value) {
+    try {
+      window.localStorage.setItem(key, String(value));
+    } catch {
+      memoryStore.set(key, String(value));
+    }
+  }
+
+  let toastTimer = null;
+  let pendingConfirmAction = null;
+  let currentTemplate = "tpl-executive";
+
+  /**
+   * Displays a non-blocking toast notification at the bottom-right corner.
+   */
+  function notify(msg) {
+    try {
+      const el = $("toast");
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove("opacity-0", "translate-y-2");
+      el.classList.add("opacity-100", "translate-y-0");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.remove("opacity-100", "translate-y-0");
+        el.classList.add("opacity-0", "translate-y-2");
+      }, 2600);
+    } catch (err) {
+      console.error("Notification error:", err);
+    }
+  }
+
+  /**
+   * Opens an inline confirmation bar in the toolbar instead of window.confirm().
+   */
+  function openInlineConfirm(title, message, onConfirm) {
+    const bar = $("inlineConfirmBar");
+    if (!bar) {
+      if (typeof onConfirm === "function") onConfirm();
+      return;
+    }
+    $("inlineConfirmTitle").textContent = (title || "Confirm") + ":";
+    $("inlineConfirmMessage").textContent = message || "Are you sure?";
+    pendingConfirmAction = typeof onConfirm === "function" ? onConfirm : null;
+    bar.classList.remove("hidden");
+  }
+
+  function closeInlineConfirm() {
+    pendingConfirmAction = null;
+    const bar = $("inlineConfirmBar");
+    if (bar) bar.classList.add("hidden");
+  }
+
+  /**
+   * Moves shared structural panels cleanly between standard flow and the Split-Sidebar Ledger.
+   */
+  function arrangePanelsForTemplate(tplClass) {
+    const logoSvg = $("brandLogoSvg");
+    const headerLogoTarget = $("headerLogoTarget");
+    const splitLeftCol = $("splitLeftCol");
+    const supplierPanel = $("supplierPanel");
+    const supplierSlot = $("supplierSlot");
+    const metaStrip = $("metaStrip");
+    const metaSlot = $("metaSlot");
+    const termsCard = $("termsCard");
+    const termsSlot = $("termsSlot");
+
+    if (!logoSvg || !headerLogoTarget || !splitLeftCol || !supplierPanel || !supplierSlot || !metaStrip || !metaSlot || !termsCard || !termsSlot) {
+      return;
+    }
+
+    if (tplClass === "tpl-split-ledger") {
+      // Left sidebar holds: Logo, Supplier Details + TRN, Invoice Metadata, Terms & Conditions
+      if (logoSvg.parentElement !== splitLeftCol) {
+        splitLeftCol.insertBefore(logoSvg, splitLeftCol.firstChild);
+      }
+      if (supplierPanel.parentElement !== splitLeftCol) {
+        splitLeftCol.appendChild(supplierPanel);
+      }
+      if (metaStrip.parentElement !== splitLeftCol) {
+        splitLeftCol.appendChild(metaStrip);
+      }
+      if (termsCard.parentElement !== splitLeftCol) {
+        splitLeftCol.appendChild(termsCard);
+      }
+    } else {
+      // Standard flow: Logo in header bar, Supplier in 2-col grid, Metadata strip below grid, Terms beside Totals
+      if (logoSvg.parentElement !== headerLogoTarget) {
+        headerLogoTarget.appendChild(logoSvg);
+      }
+      if (supplierPanel.parentElement !== supplierSlot) {
+        supplierSlot.appendChild(supplierPanel);
+      }
+      if (metaStrip.parentElement !== metaSlot) {
+        metaSlot.appendChild(metaStrip);
+      }
+      if (termsCard.parentElement !== termsSlot) {
+        termsSlot.appendChild(termsCard);
+      }
+    }
+  }
+
+  /**
+   * Switches the active layout template across all 4 presets and updates toolbar button states.
+   */
+  function applyTemplate(tplClass, showToast = false) {
+    const sheet = $("invoice");
+    if (!sheet) return;
+
+    const validTpl = ALL_TEMPLATES.includes(tplClass) ? tplClass : "tpl-executive";
+    currentTemplate = validTpl;
+
+    ALL_TEMPLATES.forEach(cls => sheet.classList.remove(cls));
+    sheet.classList.add(validTpl);
+
+    arrangePanelsForTemplate(validTpl);
+    writeStorage(TEMPLATE_KEY, validTpl);
+
+    document.querySelectorAll(".tpl-btn").forEach(btn => {
+      const isActive = btn.getAttribute("data-template") === validTpl;
+      btn.className = isActive
+        ? "tpl-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-[#0f1d36] text-white border-[#0f1d36] shadow-xs"
+        : "tpl-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-slate-100 text-[#0f1d36] border-slate-200 hover:bg-slate-200";
+    });
+
+    if (showToast) {
+      notify("Layout: " + (TEMPLATE_NAMES[validTpl] || validTpl));
+    }
+  }
+
+  /**
+   * Formats a numeric value in UAE Dirhams (AED) with two decimal places.
+   */
+  function money(n) {
+    const num = Number(n);
+    const safe = Number.isFinite(num) ? num : 0;
+    return "AED " + safe.toLocaleString("en-AE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  /**
+   * Formats a sequence number like 1 -> "800CB-0001".
+   */
+  function formatSeq(num) {
+    const cleanNum = Math.max(1, parseInt(num, 10) || 1);
+    return PREFIX + String(cleanNum).padStart(4, "0");
+  }
+
+  function getLastSeq() {
+    return Math.max(0, parseInt(readStorage(SEQ_KEY) || "0", 10) || 0);
+  }
+
+  function updateNextSeqLabel() {
+    const label = $("nextSeqLabel");
+    if (label) {
+      label.textContent = formatSeq(getLastSeq() + 1);
+    }
+  }
+
+  function assignNextInvoiceNumber() {
+    const next = getLastSeq() + 1;
+    writeStorage(SEQ_KEY, String(next));
+    const invInput = $("invoiceNo");
+    if (invInput) {
+      invInput.value = formatSeq(next);
+    }
+    updateNextSeqLabel();
+  }
+
+  function resetSequence() {
+    openInlineConfirm(
+      "Reset Sequence",
+      "Reset automatic invoice sequence counter back to 800CB-0001?",
+      () => {
+        writeStorage(SEQ_KEY, "0");
+        updateNextSeqLabel();
+        notify("Sequence reset to 800CB-0001");
+      }
+    );
+  }
+
+  /**
+   * Adds a new line item row to the invoice items table.
+   * If the first row is completely empty, populates that row instead of leaving a blank row above it.
+   */
+  function addItem(desc = "", qty = 1, price = 0) {
+    try {
+      const tbody = $("items");
+      if (!tbody) return;
+
+      const existingRows = [...tbody.querySelectorAll("tr")];
+      if (desc && existingRows.length === 1) {
+        const onlyDesc = existingRows[0].querySelector(".desc");
+        const onlyPrice = existingRows[0].querySelector(".price");
+        const onlyQty = existingRows[0].querySelector(".qty");
+        if (onlyDesc && !onlyDesc.value.trim() && (Number(onlyPrice && onlyPrice.value) || 0) === 0) {
+          onlyDesc.value = desc;
+          if (onlyQty) onlyQty.value = qty;
+          if (onlyPrice) onlyPrice.value = price;
+          calculate();
+          return;
+        }
+      }
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input class="desc" placeholder="Battery / service description"></td>
+        <td><input class="qty qty-input" type="number" min="0" step="1" value="${qty}"></td>
+        <td><input class="price price-input" type="number" min="0" step="0.01" value="${price}"></td>
+        <td class="line-total">AED 0.00</td>
+        <td class="remove-col"><button type="button" class="remove-item-btn" title="Remove item">×</button></td>
+      `;
+
+      const descInput = tr.querySelector(".desc");
+      if (descInput) descInput.value = desc;
+
+      tr.querySelectorAll("input").forEach(el => {
+        el.addEventListener("input", calculate);
+      });
+
+      const removeBtn = tr.querySelector(".remove-item-btn");
+      if (removeBtn) {
+        removeBtn.addEventListener("click", () => {
+          tr.remove();
+          calculate();
+          notify("Item removed");
+        });
+      }
+
+      tbody.appendChild(tr);
+      calculate();
+    } catch (err) {
+      console.error("Error adding item row:", err);
+      notify("Could not add item row");
+    }
+  }
+
+  /**
+   * Recalculates line totals, discount, taxable amount, VAT, total due, balance due, and status pill.
+   */
+  function calculate() {
+    try {
+      let rawLinesTotal = 0;
+
+      document.querySelectorAll("#items tr").forEach(tr => {
+        const qtyEl = tr.querySelector(".qty");
+        const priceEl = tr.querySelector(".price");
+        const totalEl = tr.querySelector(".line-total");
+        const qty = Math.max(0, Number(qtyEl && qtyEl.value) || 0);
+        const price = Math.max(0, Number(priceEl && priceEl.value) || 0);
+        const amount = qty * price;
+        rawLinesTotal += amount;
+        if (totalEl) totalEl.textContent = money(amount);
+      });
+
+      const modeEl = $("vatMode");
+      const mode = modeEl ? modeEl.value : "exclusive";
+      const discount = Math.max(0, Number($("discount") && $("discount").value) || 0);
+      const rate = Math.max(0, Number($("vatRate") && $("vatRate").value) || 0);
+      const paid = Math.max(0, Number($("paid") && $("paid").value) || 0);
+
+      let taxable = 0;
+      let vat = 0;
+      let total = 0;
+
+      if (mode === "inclusive") {
+        const netAfterDiscount = Math.max(0, rawLinesTotal - discount);
+        const divisor = 1 + (rate / 100);
+        taxable = divisor > 0 ? netAfterDiscount / divisor : netAfterDiscount;
+        vat = netAfterDiscount - taxable;
+        total = netAfterDiscount;
+        if ($("grossLabel")) $("grossLabel").textContent = "Items Total (VAT Inc.)";
+        if ($("vatModeNote")) $("vatModeNote").textContent = "Prices already include VAT; discount is applied to gross total.";
+      } else {
+        taxable = Math.max(0, rawLinesTotal - discount);
+        vat = taxable * (rate / 100);
+        total = taxable + vat;
+        if ($("grossLabel")) $("grossLabel").textContent = "Items Total (VAT Exc.)";
+        if ($("vatModeNote")) $("vatModeNote").textContent = "Prices are VAT-exclusive; VAT is calculated on taxable amount after discount.";
+      }
+
+      const balanceDue = Math.max(0, total - paid);
+
+      if ($("subtotal")) $("subtotal").textContent = money(rawLinesTotal);
+      if ($("taxable")) $("taxable").textContent = money(taxable);
+      if ($("vat")) $("vat").textContent = money(vat);
+      if ($("grand")) $("grand").textContent = money(total);
+      if ($("balance")) $("balance").textContent = money(balanceDue);
+
+      // Update status badge shown in Mobile-First Quick-Service layout
+      const pill = $("paymentStatusPill");
+      if (pill) {
+        if (total > 0 && balanceDue <= 0.005) {
+          pill.textContent = "Paid in Full";
+          pill.className = "status-pill bg-emerald-100 text-emerald-900 border border-emerald-300";
+        } else if (paid > 0 && balanceDue > 0) {
+          pill.textContent = "Partial • Due " + money(balanceDue);
+          pill.className = "status-pill bg-sky-100 text-sky-900 border border-sky-300";
+        } else {
+          pill.textContent = "Due " + money(balanceDue);
+          pill.className = "status-pill bg-amber-100 text-amber-900 border border-amber-300";
+        }
+      }
+    } catch (err) {
+      console.error("Calculation error:", err);
+    }
+  }
+
+  function performNewInvoice() {
+    document.querySelectorAll(
+      "#customer,#phone,#email,#vehicle,#plate,#battery"
+    ).forEach(el => {
+      el.value = "";
+    });
+
+    if ($("discount")) $("discount").value = 0;
+    if ($("vatRate")) $("vatRate").value = 5;
+    if ($("paid")) $("paid").value = 0;
+    if ($("payment")) $("payment").selectedIndex = 0;
+    if ($("vatMode")) $("vatMode").value = "exclusive";
+    assignNextInvoiceNumber();
+    if ($("invoiceDate")) $("invoiceDate").value = new Date().toISOString().slice(0, 10);
+
+    if ($("items")) $("items").innerHTML = "";
+    addItem();
+    notify("New invoice created");
+  }
+
+  function newInvoice() {
+    openInlineConfirm(
+      "New Invoice",
+      "Clear current invoice and assign the next sequential invoice number?",
+      performNewInvoice
+    );
+  }
+
+  function printInvoice() {
+    try {
+      notify("Opening print / PDF dialog...");
+      window.print();
+    } catch (err) {
+      console.error("Print error:", err);
+      notify("Unable to open print dialog");
+    }
+  }
+
+  function saveDraft() {
+    try {
+      const fields = [
+        "customer", "phone", "email", "vehicle", "plate", "battery",
+        "invoiceNo", "invoiceDate", "payment", "vatMode",
+        "discount", "vatRate", "paid"
+      ];
+
+      const data = {
+        template: currentTemplate
+      };
+      fields.forEach(id => {
+        const el = $(id);
+        if (el) data[id] = el.value;
+      });
+
+      data.items = [...document.querySelectorAll("#items tr")].map(tr => [
+        tr.querySelector(".desc") ? tr.querySelector(".desc").value : "",
+        tr.querySelector(".qty") ? tr.querySelector(".qty").value : "1",
+        tr.querySelector(".price") ? tr.querySelector(".price").value : "0"
+      ]);
+
+      writeStorage(DRAFT_KEY, JSON.stringify(data));
+      notify("Draft saved");
+    } catch (err) {
+      console.error("Failed to save draft:", err);
+      notify("Could not save draft");
+    }
+  }
+
+  function loadDraft() {
+    try {
+      const raw = readStorage(DRAFT_KEY);
+      const data = raw ? JSON.parse(raw) : null;
+      if (!data) {
+        notify("No saved draft found");
+        return;
+      }
+
+      if (data.template && ALL_TEMPLATES.includes(data.template)) {
+        applyTemplate(data.template, false);
+      }
+
+      Object.keys(data).forEach(key => {
+        if (key === "items" || key === "template") return;
+        const el = $(key);
+        if (el && typeof data[key] === "string") {
+          el.value = data[key];
+        }
+      });
+
+      const tbody = $("items");
+      if (tbody) tbody.innerHTML = "";
+      (data.items || []).forEach(item => addItem(item[0], item[1], item[2]));
+      if (!data.items || !data.items.length) {
+        addItem();
+      }
+
+      calculate();
+      notify("Draft loaded");
+    } catch (err) {
+      console.error("Failed to load draft:", err);
+      notify("Could not load saved draft");
+    }
+  }
+
+  function normalizePhoneForWhatsApp(raw) {
+    let digits = (raw || "").replace(/[^\d]/g, "");
+    if (!digits) return "";
+    if (digits.startsWith("00")) {
+      digits = digits.slice(2);
+    }
+    if (digits.startsWith("05") && digits.length === 10) {
+      digits = "971" + digits.slice(1);
+    }
+    return digits;
+  }
+
+  function copyTextSafe(text) {
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    temp.style.position = "fixed";
+    temp.style.opacity = "0";
+    document.body.appendChild(temp);
+    temp.select();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch {
+      ok = false;
+    }
+    temp.remove();
+    return ok;
+  }
+
+  function shareWhatsApp() {
+    try {
+      const invNo = ($("invoiceNo") && $("invoiceNo").value.trim()) || "Draft";
+      const date = ($("invoiceDate") && $("invoiceDate").value) || new Date().toISOString().slice(0, 10);
+      const customer = ($("customer") && $("customer").value.trim()) || "Valued Customer";
+      const vehicle = $("vehicle") ? $("vehicle").value.trim() : "";
+      const plate = $("plate") ? $("plate").value.trim() : "";
+      const battery = $("battery") ? $("battery").value.trim() : "";
+
+      const lines = [...document.querySelectorAll("#items tr")]
+        .map(tr => {
+          const desc = tr.querySelector(".desc") ? tr.querySelector(".desc").value.trim() : "";
+          const qty = Number(tr.querySelector(".qty") && tr.querySelector(".qty").value) || 0;
+          const price = Number(tr.querySelector(".price") && tr.querySelector(".price").value) || 0;
+          if (!desc && price === 0) return null;
+          return `• ${desc || "Item"} (${qty} × ${money(price)}) = ${money(qty * price)}`;
+        })
+        .filter(Boolean);
+
+      const grandText = $("grand") ? $("grand").textContent : "AED 0.00";
+      const paidVal = $("paid") ? $("paid").value : 0;
+      const balanceText = $("balance") ? $("balance").textContent : "AED 0.00";
+
+      const msg = [
+        "*800 Battery Experts — Tax Invoice*",
+        "TRN: 100482917360503",
+        `Invoice #: *${invNo}* | Date: ${date}`,
+        `Customer: ${customer}`,
+        vehicle ? `Vehicle: ${vehicle}${plate ? ` (${plate})` : ""}` : (plate ? `Plate: ${plate}` : ""),
+        battery ? `Battery: ${battery}` : "",
+        lines.length ? `\n*Items:*\n${lines.join("\n")}` : "",
+        `\n*Total Due:* ${grandText}`,
+        `Paid: ${money(paidVal)}`,
+        `*Balance Due:* ${balanceText}`,
+        "\nThank you for choosing 800 Battery Experts."
+      ].filter(Boolean).join("\n");
+
+      const phone = normalizePhoneForWhatsApp($("phone") ? $("phone").value : "");
+      const url = phone
+        ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+        : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+      const shareBar = $("whatsappShareBar");
+      if (shareBar) {
+        $("waPreviewText").value = msg;
+        $("waDirectAnchor").href = url;
+        shareBar.classList.remove("hidden");
+      }
+
+      const win = window.open(url, "_blank", "noopener,noreferrer");
+      if (win) {
+        notify("Opening WhatsApp share...");
+      } else {
+        notify("Popup blocked — use Open WhatsApp or Copy Summary above");
+      }
+    } catch (err) {
+      console.error("WhatsApp share error:", err);
+      notify("Unable to prepare WhatsApp summary");
+    }
+  }
+
+  function saveImage() {
+    try {
+      const invoice = $("invoice");
+      if (!invoice) return;
+
+      notify("Generating invoice image...");
+      const clone = invoice.cloneNode(true);
+
+      clone.className = "invoice-sheet tpl-executive";
+      clone.style.display = "block";
+      clone.style.width = "794px";
+      clone.style.minHeight = "1123px";
+      clone.style.padding = "28px";
+      clone.style.margin = "0";
+      clone.style.boxShadow = "none";
+      clone.style.borderRadius = "0";
+      clone.style.border = "0";
+      clone.style.background = "#ffffff";
+
+      // Ensure standard order inside exported image clone
+      const splitLeft = clone.querySelector("#splitLeftCol");
+      const splitRight = clone.querySelector("#splitRightCol");
+      const logoSvg = clone.querySelector("#brandLogoSvg");
+      const headerLogoTarget = clone.querySelector("#headerLogoTarget");
+      const supplierPanel = clone.querySelector("#supplierPanel");
+      const supplierSlot = clone.querySelector("#supplierSlot");
+      const metaStrip = clone.querySelector("#metaStrip");
+      const metaSlot = clone.querySelector("#metaSlot");
+      const termsCard = clone.querySelector("#termsCard");
+      const termsSlot = clone.querySelector("#termsSlot");
+      const invoiceFooter = clone.querySelector(".invoice-footer");
+
+      if (logoSvg && headerLogoTarget) headerLogoTarget.appendChild(logoSvg);
+      if (supplierPanel && supplierSlot) supplierSlot.appendChild(supplierPanel);
+      if (metaStrip && metaSlot) metaSlot.appendChild(metaStrip);
+      if (termsCard && termsSlot) termsSlot.appendChild(termsCard);
+      if (splitLeft && splitRight) {
+        while (splitLeft.firstChild) splitLeft.removeChild(splitLeft.firstChild);
+        if (splitRight.firstChild) {
+          [...splitRight.firstChild.children].forEach(child => clone.appendChild(child));
+        }
+        if (invoiceFooter) clone.appendChild(invoiceFooter);
+        splitLeft.remove();
+        splitRight.remove();
+      }
+
+      clone.querySelectorAll("input, textarea, select").forEach(el => {
+        const isInSummaryRow = !!el.closest(".summary-row");
+        const replacement = document.createElement("span");
+        replacement.textContent = el.value || "";
+        replacement.style.display = isInSummaryRow ? "inline-block" : "block";
+        replacement.style.padding = "3px 4px";
+        replacement.style.minHeight = "16px";
+        replacement.style.fontWeight = isInSummaryRow ? "700" : "400";
+        replacement.style.whiteSpace = "pre-wrap";
+        el.replaceWith(replacement);
+      });
+
+      clone.querySelectorAll(".remove-col, .no-print, .preset-bar").forEach(el => el.remove());
+
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("xmlns", svgNS);
+      svg.setAttribute("width", "794");
+      svg.setAttribute("height", "1123");
+
+      const foreign = document.createElementNS(svgNS, "foreignObject");
+      foreign.setAttribute("width", "794");
+      foreign.setAttribute("height", "1123");
+
+      const div = document.createElement("div");
+      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+
+      const style = document.createElement("style");
+      const pageStyles = [...document.querySelectorAll("style")].map(s => s.textContent).join("\n");
+      style.textContent = pageStyles +
+        "body{background:#fff;font-family:Inter,Arial,sans-serif}.invoice-sheet{box-shadow:none;border:0}";
+      div.appendChild(style);
+      div.appendChild(clone);
+
+      foreign.appendChild(div);
+      svg.appendChild(foreign);
+
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1588;
+        canvas.height = 2246;
+
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(result => {
+          URL.revokeObjectURL(url);
+          if (!result) {
+            notify("Image export failed — try Print / Save PDF");
+            return;
+          }
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(result);
+          const invNum = ($("invoiceNo") && $("invoiceNo").value.trim()) || "800-Battery-Invoice";
+          a.download = invNum + ".png";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          notify("Invoice PNG downloaded");
+        }, "image/png");
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        notify("Image export blocked by browser — use Print / Save PDF");
+      };
+
+      img.src = url;
+    } catch (err) {
+      console.error("Image export error:", err);
+      notify("Image export failed — try Print / Save PDF");
+    }
+  }
+
+  function bindAllControls() {
+    // Template switcher buttons
+    document.querySelectorAll(".tpl-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tpl = btn.getAttribute("data-template");
+        applyTemplate(tpl, true);
+      });
+    });
+
+    // Quick-service preset chips in Mobile-First layout
+    document.querySelectorAll(".preset-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const desc = chip.getAttribute("data-preset-desc") || "Service";
+        const price = Number(chip.getAttribute("data-preset-price")) || 0;
+        addItem(desc, 1, price);
+        notify("Added: " + desc);
+      });
+    });
+
+    if ($("inlineConfirmCancelBtn")) {
+      $("inlineConfirmCancelBtn").addEventListener("click", closeInlineConfirm);
+    }
+    if ($("inlineConfirmProceedBtn")) {
+      $("inlineConfirmProceedBtn").addEventListener("click", () => {
+        const action = pendingConfirmAction;
+        closeInlineConfirm();
+        if (typeof action === "function") {
+          action();
+        }
+      });
+    }
+
+    if ($("btnCopyWaMsg")) {
+      $("btnCopyWaMsg").addEventListener("click", () => {
+        const text = $("waPreviewText") ? $("waPreviewText").value : "";
+        if (copyTextSafe(text)) {
+          notify("WhatsApp summary copied to clipboard");
+        } else {
+          notify("Select and copy the text above");
+        }
+      });
+    }
+    if ($("btnCloseWaBar")) {
+      $("btnCloseWaBar").addEventListener("click", () => {
+        if ($("whatsappShareBar")) $("whatsappShareBar").classList.add("hidden");
+      });
+    }
+
+    // Delegated click listener for toolbar & action buttons
+    document.addEventListener("click", event => {
+      const btn = event.target.closest("[data-action]");
+      if (!btn) return;
+      const action = btn.getAttribute("data-action");
+      switch (action) {
+        case "addItem":
+          addItem();
+          notify("Item added");
+          break;
+        case "shareWhatsApp":
+          shareWhatsApp();
+          break;
+        case "printInvoice":
+          printInvoice();
+          break;
+        case "saveImage":
+          saveImage();
+          break;
+        case "saveDraft":
+          saveDraft();
+          break;
+        case "loadDraft":
+          loadDraft();
+          break;
+        case "newInvoice":
+          newInvoice();
+          break;
+        case "resetSequence":
+          resetSequence();
+          break;
+        default:
+          break;
+      }
+    });
+
+    if ($("vatMode")) {
+      $("vatMode").addEventListener("change", calculate);
+    }
+    ["discount", "vatRate", "paid"].forEach(id => {
+      const el = $(id);
+      if (el) el.addEventListener("input", calculate);
+    });
+  }
+
+  function initApp() {
+    bindAllControls();
+    const savedTpl = readStorage(TEMPLATE_KEY);
+    applyTemplate(savedTpl || "tpl-executive", false);
+    assignNextInvoiceNumber();
+    if ($("invoiceDate") && !$("invoiceDate").value) {
+      $("invoiceDate").value = new Date().toISOString().slice(0, 10);
+    }
+    if ($("items") && $("items").children.length === 0) {
+      addItem();
+    }
+    calculate();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
+  } else {
+    initApp();
+  }
+})();
+</script>
+
+</body>
+</html>
